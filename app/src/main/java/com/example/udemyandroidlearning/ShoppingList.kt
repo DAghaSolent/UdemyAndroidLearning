@@ -2,6 +2,7 @@ package com.example.udemyandroidlearning
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,7 +26,7 @@ data class ShoppingItem(val id:Int, var name:String, var quantity:Int, var isEdi
 
 @Composable
 fun ShoppingListApp(){
-    val sItems by remember{ mutableStateOf(listOf<ShoppingItem>()) }
+    var sItems by remember{ mutableStateOf(listOf<ShoppingItem>()) }
     var showDialog by remember{ mutableStateOf(false) }
     var itemName by remember { mutableStateOf("") }
     var itemQuantity by remember { mutableStateOf("") }
@@ -47,20 +48,53 @@ fun ShoppingListApp(){
         }
 
         if(showDialog){
-            AlertDialog(onDismissRequest = {showDialog = false}, confirmButton = { /*TODO*/ },
+            AlertDialog(onDismissRequest = {showDialog = false},
+                confirmButton = {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween){
+                        Button(onClick = {
+                            if(itemName.isNotBlank()){
+                                val newItem = ShoppingItem(
+                                    id = sItems.size + 1,
+                                    name = itemName,
+                                    quantity = itemQuantity.toInt()
+                                )
+                                sItems = sItems + newItem
+                                showDialog = false
+                                itemName = ""
+                                itemQuantity = ""
+                            }
+                        }) {
+                            Text("Add")
+                        }
+                        Button(onClick = {
+                            showDialog = false
+                            itemName = ""
+                            itemQuantity = ""
+                        }) {
+                            Text("Cancel")
+                        }
+                    }
+                },
                 title = {Text("Add Shopping Item")},
                 text = {
                     Column {
                         OutlinedTextField(value = itemName ,
                             onValueChange = {itemName = it},
                             singleLine = true,
-                            modifier = Modifier.fillMaxWidth().padding(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
                         )
 
                         OutlinedTextField(value = itemQuantity ,
                             onValueChange = {itemQuantity = it},
                             singleLine = true,
-                            modifier = Modifier.fillMaxWidth().padding(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
                         )
                     }
                 })
